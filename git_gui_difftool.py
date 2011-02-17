@@ -9,6 +9,7 @@ LOG_FILENAME = '/media/DATA/t/git_gui_difftool.py.log'
 logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG)
 '''
 
+#Here you can use bcompare(beyond compare),meld and so on
 DIFFTOOL = "bcompare"
 
 def find_git(fp):
@@ -40,6 +41,8 @@ def main(fp):
         
         #logging.debug("change to %s"%os.getcwd())
         fn = os.path.split(relfp)[-1]
+        #I learn this command in here:
+        #http://article.gmane.org/gmane.comp.version-control.git/167064
         cmd = 'git --work-tree=. --git-dir="%s" cat-file blob HEAD:%s>%s'%(git_dp,relfp,fn)
         ret = os.system(cmd)
         #logging.debug("%s return %s"%(cmd,ret))
