@@ -1,17 +1,12 @@
 git gui difftool is a script using in git-gui,make it easy to use visual diff tool in git-gui.
 
-setting:
--modify the DIFFTOOL in git_gui_difftool.py to the visual diff tool command you are using
--git gui
--menu->Tools
--fill in Add Tool dialog:
- -Name: for example "difftool"
- -Command: "YOUR_PATH_TO_git_gui_difftool.py $FILENAME"
- -Don't show the command output window:☑
- -Run only if a diff is selected ($FILENAME not empty):☑
- -Add globally:☑
+install & setting
+run these commands:
+ git clone git://github.com/zhangchunlin/gitguidifftool.git
+ cd gitguidifftool
+ .\git_gui_difftool.py
 
-usage:
+usage
 -git gui
 -click at the file you want to visual diff
 -menu->Tools->the menu you just setting

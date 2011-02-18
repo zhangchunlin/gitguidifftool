@@ -2,15 +2,42 @@
 #coding=utf-8
 
 import os,sys,string,shutil
-'''
-import logging
 
-LOG_FILENAME = '/media/DATA/t/git_gui_difftool.py.log'
-logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG)
-'''
+DEBUG = False
+
+if DEBUG:
+    import logging
+    from logging import debug as log
+    
+    pyfp = os.path.abspath(sys.argv[0])
+
+    LOG_FILENAME = '%s.log'%pyfp
+    print LOG_FILENAME
+    logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG)
+else:
+    def log(str):
+        pass
 
 #Here you can use bcompare(beyond compare),meld and so on
 DIFFTOOL = "bcompare"
+
+def do_config():
+    answer = raw_input("Are you sure to use difftool '%s'(y/n)?"%DIFFTOOL)
+    if (answer.lower().find("y")!=-1):
+        pyfp = os.path.abspath(sys.argv[0])
+        #print pyfp
+        cmd = 'git config --global --replace-all guitool.%s.cmd "%s \$FILENAME"'%(DIFFTOOL,pyfp)
+        print cmd
+        os.system(cmd)
+        cmd = 'git config --global --replace-all guitool.%s.noconsole "yes"'%(DIFFTOOL)
+        print cmd
+        os.system(cmd)
+        cmd = 'git config --global --replace-all guitool.%s.needsfile "yes"'%(DIFFTOOL)
+        print cmd
+        os.system(cmd)
+        print "Now you can use the git-gui's menu->Tools->%s to use visual diff tool"%DIFFTOOL
+    else:
+        print "Pls modify the DIFFTOOL in this py file to visual diff tool you are using."
 
 def find_git(fp):
     fl = fp.split("/")
@@ -26,36 +53,39 @@ def find_git(fp):
     return "",""
 
 def main(fp):
-    #logging.debug("-------")
+    log("-------")
     fp = os.path.abspath(fp)
-    #logging.debug(fp)
+    log(fp)
     git_dp,relfp = find_git(fp)
-    #logging.debug("%s %s"%(git_dp,relfp))
+    log("%s %s"%(git_dp,relfp))
     if git_dp!="":
         old_cwd = os.getcwd()
-        #logging.debug("old:%s"%os.getcwd())
+        log("old:%s"%os.getcwd())
         
         tmpdp = os.tmpnam()+".HEAD"
         os.mkdir(tmpdp)
         os.chdir(tmpdp)
         
-        #logging.debug("change to %s"%os.getcwd())
+        log("change to %s"%os.getcwd())
         fn = os.path.split(relfp)[-1]
         #I learn this command in here:
         #http://article.gmane.org/gmane.comp.version-control.git/167064
-        cmd = 'git --work-tree=. --git-dir="%s" cat-file blob HEAD:%s>%s'%(git_dp,relfp,fn)
+        cmd = 'git --git-dir="%s" cat-file blob HEAD:%s>%s'%(git_dp,relfp,fn)
         ret = os.system(cmd)
-        #logging.debug("%s return %s"%(cmd,ret))
+        log("%s return %s"%(cmd,ret))
         if ret==0:
             if os.path.exists(fn):
                 cmd = '%s %s %s'%(DIFFTOOL,fp,fn)
-                #logging.debug(cmd)
+                log(cmd)
                 os.system(cmd)
         shutil.rmtree(tmpdp)
         
         os.chdir(old_cwd)
-        #logging.debug("change back to %s"%os.getcwd())
+        log("change back to %s"%os.getcwd())
 
 if __name__ == '__main__':
+    log("%d"%(len(sys.argv)))
     if len(sys.argv)>1:
         main(sys.argv[1])
+    else:
+        do_config()
